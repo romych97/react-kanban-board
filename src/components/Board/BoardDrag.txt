@@ -1,0 +1,227 @@
+
+
+function Board() {
+
+    const drag = (event: React.DragEvent<any>) => {
+        console.log(event)
+        event.dataTransfer.setData("text/plain", (event.target as HTMLInputElement).id);
+      }
+      
+      const allowDrop = (event: React.DragEvent<any>) => {
+        event.preventDefault();
+        if (hasClass(event.target, "dropzone")) {
+          addClass(event.target, "droppable");
+        }
+      }
+      
+      const clearDrop = (event: React.DragEvent<any>) => {
+          removeClass(event.target,"droppable");
+      }
+      
+      const drop = (event: any) => {
+        event.preventDefault();
+        const data = event.dataTransfer.getData("text/plain");
+        const element = document.querySelector(`#${data}`);
+        try {
+          // remove the spacer content from dropzone
+          event.target.removeChild(event.target.firstChild);
+          // add the draggable content
+          event.target.appendChild(element);
+          // remove the dropzone parent
+          unwrap(event.target);
+        } catch (error) {
+          console.warn("can't move the item to the same place")
+        }
+        updateDropzones();
+      }
+      
+      const updateDropzones = () => {
+        console.log('updateDropzones')
+          /* after dropping, refresh the drop target areas
+            so there is a dropzone after each item
+            using jQuery here for simplicity */
+          
+          var dz = document.createElement('div');
+          dz.innerHTML = '<div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>'
+
+          // '<div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>'
+          
+          // delete old dropzones
+          for (let index = 0; index < document.getElementsByClassName('dropzone').length; index++) {
+              document.getElementsByClassName('dropzone')[index].remove()
+          }
+      
+          // insert new dropdzone after each item   
+        //   dz.insertAfter('.card.draggable');
+          
+          // insert new dropzone in any empty swimlanes
+        //   $(".items:not(:has(.card.draggable))").append(dz);
+      };
+      
+      // helpers
+      function hasClass(target: any, className: any) {
+          return new RegExp('(\\s|^)' + className + '(\\s|$)').test((target as HTMLElement).className);
+      }
+      
+      function addClass(ele: any, cls: any) {
+        if (!hasClass(ele,cls)) ele.className += " "+cls;
+      }
+      
+      function removeClass(ele: any, cls: any) {
+        if (hasClass(ele,cls)) {
+          var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+          ele.className=ele.className.replace(reg,' ');
+        }
+      }
+      
+      function unwrap(node: any) {
+          node.replaceWith(...node.childNodes);
+      }
+      
+
+    return (
+        <div className="container-fluid pt-3">
+    <h3 className="font-weight-light text-white">Kanban Board</h3>
+    <div className="small  text-light">Drag and drop between swim lanes</div>
+    <div className="row flex-row flex-sm-nowrap py-3">
+        <div className="col-sm-6 col-md-4 col-xl-3">
+            <div className="card bg-light">
+                <div className="card-body">
+                    <h6 className="card-title text-uppercase text-truncate py-2">To Do</h6>
+                    <div className="items border border-light">
+                        <div className="card draggable shadow-sm" id="cd2" draggable="true" onDragStart={(e) => drag(e)}>
+                            <div className="card-body p-2">
+                                <div className="card-title">
+                                    <img src="//placehold.it/30" className="rounded-circle float-right" />
+                                    <a href="" className="lead font-weight-light">TSK-156</a>
+                                </div>
+                                <p>
+                                    This is a description of a item on the board.
+                                </p>
+                                <button className="btn btn-primary btn-sm w-100">View</button>
+                            </div>
+                        </div>
+                        <div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>
+                        <div className="card draggable shadow-sm" id="cd3" draggable="true" onDragStart={(e) => drag(e)}>
+                            <div className="card-body p-2"> 
+                                <div className="card-title">
+                                    <img src="//placehold.it/30" className="rounded-circle float-right" />
+                                    <a href="" className="lead font-weight-light">TSK-157</a>
+                                </div>
+                                <p>
+                                    This is an item on the board. There is some descriptive text that explains the item here.
+                                </p>
+                                <button className="btn btn-primary btn-sm w-100">View</button>
+                            </div>
+                        </div>
+
+                        <div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>
+                        
+                        <div>
+                            <button className="btn btn-primary w-100">New Task</button>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div className="col-sm-6 col-md-4 col-xl-3">
+            <div className="card bg-light">
+                <div className="card-body">
+                    <h6 className="card-title text-uppercase text-truncate py-2">In-progess</h6>
+                    <div className="items border border-light">
+                        <div className="card draggable shadow-sm" id="cd1" draggable="true" onDragStart={(e) => drag(e)}>
+                            <div className="card-body p-2">
+                                <div className="card-title">
+                                    <img src="//placehold.it/30" className="rounded-circle float-right" />
+                                    <a href="" className="lead font-weight-light">TSK-152</a>
+                                </div>
+                                <p>
+                                    This is a task that is being worked on.
+                                </p>
+                                <div className="mb-3">00:10:35</div>
+                                <button className="btn btn-primary btn-sm w-100">Resolve</button>
+                            </div>
+                        </div>
+                        <div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>
+                        <div className="card draggable shadow-sm" id="cd2" draggable="true" onDragStart={(e) => drag(e)}>
+                            <div className="card-body p-2">
+                                <div className="card-title">
+                                    <img src="//placehold.it/30" className="rounded-circle float-right" />
+                                    <a href="" className="lead font-weight-light">TSK-153</a>
+                                </div>
+                                <p>
+                                    Another task here that is in progress.
+                                </p>
+                                <div className="mb-3">00:10:35</div>
+                                <button className="btn btn-primary btn-sm w-100">Resolve</button>
+                            </div>
+                        </div>
+                        <div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div className="col-sm-6 col-md-4 col-xl-3">
+            <div className="card bg-light">
+                <div className="card-body">
+                    <h6 className="card-title text-uppercase text-truncate py-2">Done</h6>
+                    <div className="items border border-light">
+                        <div className="card draggable shadow-sm" id="cd9" draggable="true" onDragStart={(e) => drag(e)}>
+                            <div className="card-body p-2">
+                                <div className="card-title">
+                                    <img src="//placehold.it/30" className="rounded-circle float-right" />
+                                    <a href="" className="lead font-weight-light">TSK-158</a>
+                                </div>
+                                <p>
+                                    This is a description of a item on the board.
+                                </p>
+                                <div>$5.15</div>
+                            </div>
+                        </div>
+                        <div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div className="col-sm-6 col-md-4 col-xl-3">
+            <div className="card">
+                <div className="card-body">
+                    <h6 className="card-title text-uppercase text-truncate py-2">Complete</h6>
+                    <div className="items border border-light">
+                        <div className="card draggable shadow-sm" id="cd11" draggable="true" onDragStart={(e) => drag(e)}>
+                            <div className="card-body p-2">
+                                <div className="card-title">
+                                    <img src="//placehold.it/30" className="rounded-circle float-right" />
+                                    <a href="" className="lead font-weight-light">TSK-144</a>
+                                </div>
+                                <p>
+                                    This is a description of an item.
+                                </p>
+                                <button className="btn btn-primary btn-sm w-100">View</button>
+                            </div>
+                        </div>
+                        <div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>
+                        <div className="card draggable shadow-sm" id="cd12" draggable="true" onDragStart={(e) => drag(e)}>
+                            <div className="card-body p-2">
+                                <div className="card-title">
+                                    <img src="//placehold.it/30" className="rounded-circle float-right" />
+                                    <a href="" className="lead font-weight-light">TSK-146</a>
+                                </div>
+                                <p>
+                                    This is a description of a task item.
+                                </p>
+                                <button className="btn btn-primary btn-sm w-100">View</button>
+                            </div>
+                        </div>
+                        <div className="dropzone rounded" onDrop={(e) => drop(e)} onDragOver={(e) => allowDrop(e)} onDragLeave={(e) => clearDrop(e)}> &nbsp; </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    )
+}
+
+export default Board;
